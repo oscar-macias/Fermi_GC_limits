@@ -1,0 +1,114 @@
+Supplementary material for Astrophysical Journal, XX, XXX
+Contact: Matthew Wood <mdwood@slac.stanford.edu>
+
+This distribution contains machine-readable text files corresponding
+to the analysis and results of ApJ, XXX, XXX. These files can be
+divided into the following categories:
+
+===============================
+=== Dark Matter Constraints ===
+===============================
+Number of files: 6
+File naming: limits_<channel>.txt
+Description:
+    Upper limits on the DM annihilation cross section versus mass for
+    individual targets and the combined analysis of 41 dwarf galaxies
+    and dwarf galaxy candidates.  Note that individual target limits
+    are profiled with respect to the J-Factor uncertainty of the
+    respective dwarf galaxy in the same way as done in the combined
+    analysis.
+    
+Structure:
+    Column [0]:    Dark matter particle mass (GeV)
+    Column [1-25]: Constraints on <sigmav> derived
+        from each target with either a kinematically
+        determined J-factor or a predicted J-factor (for ).        
+    Column [26]: Constraints on <sigmav> derived from a combined
+        analysis of the 41 targets in the "standard" sample.
+
+================================
+===  Bin-By-Bin Flux Limits  ===
+================================
+Number of files: 1
+File naming: bin_by_bin_limits_<type>.txt
+Description:
+    Bin-by-bin upper limits for each dwarf galaxy on the integral
+    (type=eflux) and differential (type=e2dnde) flux.  Both
+    calculations model the flux distribution within an energy bin as a
+    power-law with index=2.
+
+Structure:
+    Column [0-1]: Minimum and maximum energy edges of each bin
+        (MeV).        
+    Column [2-27]: Energy flux upper limit (MeV cm^-2 s^-1;
+        type=eflux) or E^2 times the differential flux upper limit
+        (MeV cm^-2 s^-1; type=e2dnde) derived from each dwarf galaxy
+        in the energy bin specified by Columns [0-1].
+
+================================
+===  Bin-By-Bin Likelihoods  ===
+================================
+Number of files: 45
+File naming: like_<dwarf>.txt
+Description:
+    These files contain likelihood functions for each target derived 
+    energy-bin by energy-bin, tabulated as the delta log-like value 
+    for 25 different values of the energy flux of a putative dwarf source.
+Structure:
+    Column [0-1]: Minimum and maximum energy edges of each
+        bin (MeV).        
+    Column [2]: Energy flux (MeV cm^-2 s^-1) of a putative dwarf
+        source integrated over the specified bin.        
+    Column [3]:   Delta log-likelihood as a function of
+        the energy flux of the source
+
+================================
+===  Likelihood SEDs         ===
+================================
+Number of files: 1
+File naming: like_all_targets.fits
+Description:
+    FITS file with bin-by-bin results (likelihood, flux, TS, upper
+    limits) for all targets.  The file contains a single BINTABLE with    
+    one row per target.  The information in this table is the same as
+    provided in the bin-by-bin flux and likelihood ascii tables.
+
+Columns:
+    name: Target name.
+    e_min: Lower bin edge in MeV.
+    e_ref: Bin center in MeV.
+    e_max: Upper bin edge in MeV.
+    dloglike_scan : Delta log-likelihood vs. source amplitude
+        in each energy bin.
+    norm_scan : Scan points for likelihood profile in units of the
+        reference model amplitude.  Multiply by ref_eflux to convert
+        this column to energy flux.
+    loglike : Model likelihood at the best-fit source amplitude.
+    ref_eflux : Reference model amplitude in energy
+        flux ( MeV / (cm2 * s) ).
+    ref_flux : Reference model amplitude in flux ( 1 / (cm2 * s) ).
+    ref_npred : Reference model amplitude in counts.
+    ref_dnde : Reference model amplitude in differential
+        flux ( 1 / (MeV * cm2 * s) ).
+
+=========================
+===  Example Scripts  ===
+=========================
+Also included in this directory are a set of example scripts to 
+aid with a few potential usage cases. These scripts are merely 
+meant to illustrate how to operate with the data included here 
+and *DO NOT* represent a rigorous analysis, nor do they constitute 
+a fully fledged interface to the data themselves. A brief 
+description of the examples is included below.
+
+example1.py -- This example demonstrates how to load 
+               and plot the dark matter limit files.
+example2.py -- This example demonstrates how to load
+               and plot the bin-by-bin likelihood limits.
+example3.py -- This example demonstrates how to load
+               the bin-by-bin likelihood functions and a 
+               gamma-ray spectrum and compute spectrally-
+               dependent dark matter limits on the 
+               annihilation cross section.
+               NOTE: This script *DOES NOT* incorporate 
+               uncertainties on the measured J-factor.
