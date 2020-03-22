@@ -4,7 +4,7 @@
 #  Ryan Keeley <rkeeley@uci.edu> and Oscar Macias <oscar.macias@ipmu.jp>
 #  This example reproduces the dark matter limits in <https://arxiv.org/pdf/2003.>
 #  here we show how to reproduce the DM limits in  Figs. 1 and 2.
-#  Example usage, execute this file as:  $ python Fermi_GC_limits.py --channel=0 --ignore
+#  Example usage, execute this file as:   $ python Fermi_GC_limits.py --channel=0 --GDE_model=0 --DM_model=1 --ignore
 #
 #  This file is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
