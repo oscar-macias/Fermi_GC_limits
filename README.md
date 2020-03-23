@@ -2,7 +2,7 @@
 Calculating Limits on WIMP DM annihilation cross sections from Femi GC gamma ray data.
 This repository contains the data files for Figure 1, but it also contains the full
 log-like data files and our Bayesian pipeline necessary to reproduce
-these figures. So, if you are interested in including our derived limits in your plot please 
+the figures in our paper. So, if you are interested in including our derived limits in your plot please 
 go to directory Fig1_data, but if you are interested in constraining your own model
 or simply reproducing our results, please see below instructions.
 
