@@ -40,11 +40,11 @@ def main():
     # Parse command-line arguments.
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('--channel', type=int, default=0,
-        help='annihilation channel: bbar=0 tau=1, default bbar')
+        help='annihilation channel: bbar=0, tau=1, mu=2, W=3, Z=4, Higgs=5: default bbar')
     parser.add_argument('--GDE_model', type=int, default=0,
         help='GDE model, default baseline')
     parser.add_argument('--DM_model', type=int, default=0,
-        help='background model used to generate the data used for the GCE: boxy=0, xshape=1')
+        help='DM morphology')
     parser.add_argument('--path', type=str, default='.', help='Provide absolute path to your results directory')
     parser.add_argument('--trunc', type=int, default=0,
         help='number of data points to truncate at low energies, default 0')
@@ -68,7 +68,7 @@ def main():
         if os.path.isdir(path):
             return path
         else:
-            raise argparse.ArgumentTypeError(r'readable_dir:{path} is not a valid path')
+            raise argparse.ArgumentTypeError(r'readable_dir:{'+path+'} is not a valid path')
 
     # Supported self-annihilation channels
     channel_name = ['bbar','tau','mu','W','Z','higgs'][channel]
@@ -138,7 +138,7 @@ def main():
 
     n_sigma = 61
     sigma = np.logspace(-29., -23., num=n_sigma, endpoint=True) #flat prior in logspace (scale-invariant)
-    sigma_prior_norm = np.trapz(np.ones(n_sigma), x=np.log(sigma)) #the inverse of this norm quantities are the prior on sigma
+    sigma_prior_norm = np.trapz(np.ones(n_sigma), x=np.log(sigma)) #the inverse of this norm quantity is the prior on sigma
 
     # --------------------------------------------------------------------------
     # Read in the log-like data obtained from maximum-likelihood runs
@@ -159,7 +159,7 @@ def main():
         dloglike_load,nflux_load = np.loadtxt('./data/likelihood_profiles/'+GDE_kind+'/UL_scan_Ebin_'+str(trunc+i+2)+'_'+label+'.dat', delimiter=',').T
         dloglike = np.insert(dloglike_load,0,0.0)
         nflux = np.insert(nflux_load,0,0.0)
-        f = interp1d(nflux,dloglike - 1.3,kind='linear',bounds_error=False,fill_value='extrapolate')
+        f = interp1d(nflux,dloglike - 1.35,kind='linear',bounds_error=False,fill_value='extrapolate')
         flux_high[i] = brentq(f,0.,nflux[-1])
 
     # -----------------------------------------------------------------------------
@@ -172,7 +172,7 @@ def main():
             trunc an int, ignores the first number energy bins
         '''
         energy_dat = np.loadtxt('./data/likelihood_profiles/'+GDE_kind+'/Ebands.dat')
-        assert model_flux.shape[3] == energy_dat[trunc:].shape[0], 'the energy shape are not right ' + str(
+        assert model_flux.shape[3] == energy_dat[trunc:].shape[0], 'the energy shapes are not right ' + str(
             model_flux.shape[3]) + ' and ' + str(energy_dat[trunc:].shape[0])
         delta_log_like = np.zeros(model_flux.shape)
         for i in range(model_flux.shape[3]):
@@ -195,11 +195,6 @@ def main():
 
     #This is a binned dflux/dE
     nspec_GCE = GCE_calcs.calculations.get_eflux(binned_spectra,J,sigma,mass_table) #it says get e_flux but since a binned number flux (dN/dE) is input, it returns a number spectra
-    #print(nspec_GCE.shape)
-    #print('cross section')
-    #print(sigma[21])
-    #print('mass')
-    #print(mass_table[14])
 
 
     log_like_GCE_4d = GCE_delta_log_like_limits(nspec_GCE,GDE_kind,label,trunc)
@@ -210,24 +205,11 @@ def main():
 
     jmax_prior = J_prior.argmax()
 
-    print(J[jmax_prior])
-    print(log_like_GCE_4d[21,jmax_prior,14,:])
-    print(log_like_GCE_3d[21,jmax_prior,14])
-
     J_prior = np.tile(J_prior[np.newaxis,:,np.newaxis],(n_sigma,1,n_mass)) #tiling to make the prior the same shape as the likelihood
 
     GCE_like_3d = np.exp(log_like_GCE_3d)*J_prior
 
     GCE_like_2d = np.trapz(GCE_like_3d, x=np.log10(J), axis=1) #marginalizing over the J factor
-
-    max_index_GCE = np.unravel_index(GCE_like_3d.argmax(),GCE_like_3d.shape)
-    #print(max_index_GCE)
-
-    max_index_GCE_2d = np.unravel_index(GCE_like_2d.argmax(),GCE_like_2d.shape)
-    #print(max_index_GCE_2d)
-
-    max_index_GCE_2d_j = np.unravel_index(GCE_like_3d[max_index_GCE_2d[0],:,max_index_GCE_2d[1]].argmax(),GCE_like_3d[max_index_GCE_2d[0],:,max_index_GCE_2d[1]].shape)
-    #print(max_index_GCE_2d_j)
 
     evidence_GCE = np.trapz(np.trapz(GCE_like_2d,x = np.log(sigma),axis =0),x = np.log10(mass_table),axis=0) / (sigma_prior_norm * mass_prior_norm)
 
@@ -250,10 +232,10 @@ def main():
     plt.ylabel(r'Cross Section [cm$^3$ sec$^{-1}$]')
     plt.legend(loc='best',frameon=False)
     #plt.title(r'GCE $-\Delta$Log-Likelihood Contours')
-    plt.savefig(path + '/GCE_contours_'+label+'.png')
+    plt.savefig(dir_path(path) + '/GCE_contours_'+label+'.png')
     plt.clf()
 
-    np.savetxt(path + '/sigma_mass_posterior_'+label+'.txt', (-np.log(GCE_like_2d) + np.log(GCE_like_2d.max())))
+    np.savetxt(dir_path(path) + '/sigma_mass_posterior_'+label+'.txt', (-np.log(GCE_like_2d) + np.log(GCE_like_2d.max())))
     '''
     cmap = cm.cool
     levels = [1.35] # 95% CL level upper limits
@@ -270,7 +252,7 @@ def main():
     plt.savefig(path + '/DM_upperlimits_'+label+'.png')
     plt.clf()
 
-    np.savetxt(path + '/sigma_mass_posterior_'+label+'.txt', (-np.log(GCE_like_2d) + np.log(GCE_like_2d.max())))
+    np.savetxt(dir_path(path) + '/sigma_mass_posterior_'+label+'.txt', (-np.log(GCE_like_2d) + np.log(GCE_like_2d.max())))
     '''
 if __name__ == '__main__':
     main()
