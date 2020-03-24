@@ -1,4 +1,4 @@
-# Fermi Galactic Center Limits
+# Fermi Galactic Center Limits (arXiv:2003.10416)
 Calculating Limits on WIMP DM annihilation cross sections from Femi GC gamma ray data.
 This repository contains the data files for Figure 1, but it also contains the full
 log-like data files and our Bayesian pipeline necessary to reproduce
@@ -22,7 +22,7 @@ command line args: channel - an integer index specifying which annihilation to c
                    ignore - Boolean flag to ignore ''divide by zero'' errors encounterd in ''log''
 ```
 
-Note: The limits shown in Fig.1 of arxiv: are the weakest limits of many different ones 
+Note: The limits shown in Fig.1 of arXiv:2003.10416 are the weakest limits of many different ones 
 that considered different Galactic diffuse emission (GDE) models and dark matter (DM) morphologies.
 In practice you should run this script a few more times using different GDE models and DM morphologies
 to get exactly our Fig.1. However, the individual limits are shown in our Fig.2, and you can directly 
