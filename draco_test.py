@@ -37,7 +37,6 @@ import GCE_calcs
 
 # -----------------------------------------------------------------------------------
 def main():
-    # Parse command-line arguments.
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('--channel', type=int, default=0,
                         help='annihilation channel: bbar=0 tau=1, default bbar')
