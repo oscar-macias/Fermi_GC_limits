@@ -34,7 +34,7 @@ We have constructed a script that uses our Bayesian method to reproduce the resu
 In particular, this script reads in the log-like data for the Draco dSph and dumps out the 95% CL upper limits on $<\sigma v>$
 as a function of DM mass, but can be easily expanded to reproduce the full results in the paper above.
 
-To run the code execute :
+To run the code execute:
 ```console
 python draco_test.py --channel=0 --ignore
 ```
