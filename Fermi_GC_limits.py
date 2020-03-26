@@ -32,7 +32,6 @@ from scipy.interpolate import interp1d
 from scipy.optimize import brentq
 from scipy import interpolate
 
-
 import GCE_calcs
 
 
