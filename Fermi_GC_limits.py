@@ -74,7 +74,7 @@ def main():
     # DM profiles: 0:NFW, 1:triaxial NFW, 2:Read, 3:triaxial Read
     # if GDE model is NFW_gamma, the code assumes GDE_baseline and the NFW gamma index runs from 0-9 spanning gamma= {0.5,1.5}
 
-    GDE_kind = ['GDE_baseline','GDE_Dust','GDE_Gas','NFW_gamma','GDE_CSE','GDE_ICS_6rings'][kind]
+    GDE_kind = ['GDE_baseline','GDE_Dust','GDE_Gas','NFW_gamma','GDE_CSE','GDE_ICS_6rings','GDE_Gas_ICS_6rings'][kind]
     if GDE_kind == 'GDE_baseline':
         if model > 3:
             print('choose a different DM model: 0,1,2,3')
@@ -141,7 +141,7 @@ def main():
 
     # --------------------------------------------------------------------------
     # Read in the log-like data obtained from maximum-likelihood runs
-    energies = np.loadtxt('./data/likelihood_profiles/'+GDE_kind+'/Ebands.dat')
+    energies = np.loadtxt('./data/likelihood_profiles/'+GDE_kind+'_corrected/Ebands.dat')
     emin = energies[:,1]
     emax = energies[:,2]
     de = (emax-emin)/1e6
@@ -155,9 +155,7 @@ def main():
     for i in range(energies[trunc:].shape[0]):
         # This chunk can be used to plot the 95% CL flux upper limits as obtained from the log-like analysis
         # Finds the d log like =1.3  (95% CL) for each energy bin and saves that flux value
-        dloglike_load,nflux_load = np.loadtxt('./data/likelihood_profiles/'+GDE_kind+'/UL_scan_Ebin_'+str(trunc+i+2)+'_'+label+'.dat', delimiter=',').T
-        dloglike = np.insert(dloglike_load,0,0.0)
-        nflux = np.insert(nflux_load,0,0.0)
+        dloglike,nflux = np.loadtxt('./data/likelihood_profiles/'+GDE_kind+'_corrected/UL_scan_Ebin_'+str(trunc+i+2)+'_'+label+'_V2.dat', delimiter=',').T
         f = interp1d(nflux,dloglike - 1.35,kind='linear',bounds_error=False,fill_value='extrapolate')
         flux_high[i] = brentq(f,0.,nflux[-1])
 
@@ -170,14 +168,12 @@ def main():
            GDE_kind and label just specify which likelihood profiles to load (GDE model plus DM morphology)
             trunc an int, ignores the first number energy bins
         '''
-        energy_dat = np.loadtxt('./data/likelihood_profiles/'+GDE_kind+'/Ebands.dat')
+        energy_dat = np.loadtxt('./data/likelihood_profiles/'+GDE_kind+'_corrected/Ebands.dat')
         assert model_flux.shape[3] == energy_dat[trunc:].shape[0], 'the energy shapes are not right ' + str(
             model_flux.shape[3]) + ' and ' + str(energy_dat[trunc:].shape[0])
         delta_log_like = np.zeros(model_flux.shape)
         for i in range(model_flux.shape[3]):
-            dloglike_load, nflux_load = np.loadtxt('./data/likelihood_profiles/'+GDE_kind+'/UL_scan_Ebin_'+str(trunc+i+2)+'_'+label+'.dat', delimiter=',').T
-            dloglike = np.insert(dloglike_load, 0, 0.0)
-            nflux = np.insert(nflux_load, 0, 0.0)
+            dloglike, nflux = np.loadtxt('./data/likelihood_profiles/'+GDE_kind+'_corrected/UL_scan_Ebin_'+str(trunc+i+2)+'_'+label+'_V2.dat', delimiter=',').T
             f = interpolate.interp1d(nflux, -dloglike, kind='linear', bounds_error=False, fill_value='extrapolate')
             delta_log_like[:, :, :, i] = f(model_flux[:, :, :, i])
         return delta_log_like
@@ -219,10 +215,9 @@ def main():
                         top=0.98,wspace=0.0,hspace=0.18)
 
     cmap = cm.cool
-    levels = [1.35] #[0,1,3,4.4,6,10,15,21,28,36]
-    dloglike_2d =np.log(GCE_like_2d) - np.log(GCE_like_2d.max())
-    manual_locations = [(41, 3e-26), (40, 1e-25), (39, 3e-25), (37, 1e-24), (34, 3e-24)]
-    CS = plt.contour(mass_table,sigma,-np.log(GCE_like_2d) + np.log(GCE_like_2d.max()), levels, cmap=cm.get_cmap(cmap, len(levels) - 1))
+
+    levels = [3.0]  #[0,1,3,4.4,6,10,15,21,28,36]
+    CS = plt.contour(mass_table,sigma,-np.log(GCE_like_2d) + np.log(GCE_like_2d[0,-1]), levels, cmap=cm.get_cmap(cmap, len(levels) - 1))
     plt.yscale('log')
     plt.xscale('log')
     plt.xlabel('Mass [GeV]')
@@ -235,23 +230,5 @@ def main():
     plt.clf()
 
     np.savetxt(dir_path(path) + '/sigma_mass_posterior_'+label+'.txt', (-np.log(GCE_like_2d) + np.log(GCE_like_2d.max())))
-    '''
-    cmap = cm.cool
-    levels = [1.35] # 95% CL level upper limits
-    manual_locations = [(41, 3e-26), (40, 1e-25), (39, 3e-25), (37, 1e-24), (34, 3e-24)]
-    CS = plt.contour(mass_table,sigma,-np.log(GCE_like_3d[:,jmax_prior,:]) + np.log(GCE_like_3d[:,jmax_prior,:].max()), levels, cmap=cm.get_cmap(cmap, len(levels) - 1))
-    plt.yscale('log')
-    plt.xscale('log')
-    plt.xlabel('Mass [GeV]')
-    plt.ylim(1e-28,1e-23)
-    plt.xlim(7, 1e4)
-    plt.ylabel(r'Cross Section [cm$^3$ sec$^{-1}$]')
-    #plt.title(r'GCE $-\Delta$Log-Likelihood Contour Slice')
-    plt.legend(loc='best',frameon=False)
-    plt.savefig(path + '/DM_upperlimits_'+label+'.png')
-    plt.clf()
-
-    np.savetxt(dir_path(path) + '/sigma_mass_posterior_'+label+'.txt', (-np.log(GCE_like_2d) + np.log(GCE_like_2d.max())))
-    '''
 if __name__ == '__main__':
     main()
