@@ -216,7 +216,7 @@ def main():
 
     cmap = cm.cool
 
-    levels = [3.0]  #[0,1,3,4.4,6,10,15,21,28,36]
+    levels = [1.35]  #[0,1,3,4.4,6,10,15,21,28,36]
     CS = plt.contour(mass_table,sigma,-np.log(GCE_like_2d) + np.log(GCE_like_2d[0,-1]), levels, cmap=cm.get_cmap(cmap, len(levels) - 1))
     plt.yscale('log')
     plt.xscale('log')
